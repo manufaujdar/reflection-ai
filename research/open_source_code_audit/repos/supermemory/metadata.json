@@ -1,0 +1,14 @@
+{
+  "name": "supermemory",
+  "repository": "https://github.com/supermemoryai/supermemory",
+  "commit": "ef0026a23c160e2976480352e5a6f58762d70d13",
+  "branch": "main",
+  "commit_date": "2026-07-14T18:56:01Z",
+  "generated_at": "2026-07-15T10:31:24.888059+00:00",
+  "tracked_files": 1014,
+  "text_lines": 190912,
+  "approximate_code_lines": 156924,
+  "bytes": 101715498,
+  "symbols": 9126,
+  "relevant_paths": 225
+}

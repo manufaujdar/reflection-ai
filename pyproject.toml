@@ -8,6 +8,20 @@ version = "0.2.0"
 description = "Provider-agnostic continuous AI personalization framework"
 readme = "README.md"
 requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Manu Faujdar" }]
+keywords = ["ai", "personalization", "memory", "privacy", "evaluation", "research"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
   "fastapi>=0.115,<1",
   "httpx>=0.27,<1",
@@ -24,6 +38,10 @@ memory = ["mem0ai>=2,<3", "hindsight-client>=0.8,<1"]
 
 [project.scripts]
 reflection-ai = "reflection_ai.main:run"
+
+[project.urls]
+Repository = "https://github.com/manufaujdar/reflection-ai"
+Issues = "https://github.com/manufaujdar/reflection-ai/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/reflection_ai"]

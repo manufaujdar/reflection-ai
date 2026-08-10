@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     model_api_key: str | None = None
     training_min_events: int = 20
     profile_refresh_events: int = 5
+    chat_style_min_samples: int = 3
+    chat_history_messages: int = 20
     memory_backend: str | None = None
     memory_base_url: str | None = None
 
