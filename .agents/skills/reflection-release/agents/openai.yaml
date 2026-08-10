@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Release"
+  short_description: "Gate releases with evidence and rollback"
+  default_prompt: "Use $reflection-release to assess whether this change is ready to ship."

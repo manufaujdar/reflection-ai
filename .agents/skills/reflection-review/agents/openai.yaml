@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Reviewer"
+  short_description: "Review diffs for correctness and trust risks"
+  default_prompt: "Use $reflection-review to review this Reflection AI change."

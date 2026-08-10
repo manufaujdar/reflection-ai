@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Retrospective"
+  short_description: "Capture decisions and improve the workflow"
+  default_prompt: "Use $reflection-retro to run a trust-focused project retrospective."

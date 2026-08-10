@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Planner"
+  short_description: "Turn product intent into a safe task contract"
+  default_prompt: "Use $reflection-plan to turn this request into a scoped Reflection AI plan."

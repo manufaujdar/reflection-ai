@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Builder"
+  short_description: "Build the smallest complete user-facing slice"
+  default_prompt: "Use $reflection-build to implement this approved Reflection AI slice."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Designer"
+  short_description: "Design clear consent and memory controls"
+  default_prompt: "Use $reflection-design to design this Reflection AI experience."

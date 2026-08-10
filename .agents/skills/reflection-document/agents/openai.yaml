@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Documentation"
+  short_description: "Keep product and architecture docs truthful"
+  default_prompt: "Use $reflection-document to update docs for this completed change."

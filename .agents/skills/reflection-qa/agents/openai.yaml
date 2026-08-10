@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection QA"
+  short_description: "Verify behavior, regressions, and trust gates"
+  default_prompt: "Use $reflection-qa to validate this Reflection AI change."

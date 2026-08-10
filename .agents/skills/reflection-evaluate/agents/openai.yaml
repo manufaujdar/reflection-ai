@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Evaluator"
+  short_description: "Compare candidates and enforce promotion gates"
+  default_prompt: "Use $reflection-evaluate to define or run the candidate evaluation gate."

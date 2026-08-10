@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Privacy"
+  short_description: "Threat-model personalization data lifecycles"
+  default_prompt: "Use $reflection-privacy to audit this workflow for privacy and isolation risks."

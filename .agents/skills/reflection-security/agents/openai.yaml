@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Security"
+  short_description: "Review authentication and trust boundaries"
+  default_prompt: "Use $reflection-security to threat-model this Reflection AI change."

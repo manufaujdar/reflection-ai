@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection R&D"
+  short_description: "Research options with provenance and experiments"
+  default_prompt: "Use $reflection-research to investigate this Reflection AI question."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Engineer"
+  short_description: "Engineer robust provider-neutral components"
+  default_prompt: "Use $reflection-engineer to plan and review this architecture with invariant coverage."

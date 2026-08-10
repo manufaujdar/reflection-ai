@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Marketer"
+  short_description: "Shape accurate privacy-respecting messaging"
+  default_prompt: "Use $reflection-market to frame this capability for its intended audience."
