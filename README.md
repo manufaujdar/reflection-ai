@@ -1,5 +1,8 @@
 # Reflection AI
 
+Read the [documentation map](docs/README.md) before changing consent, memory,
+training, evaluation, or deployment behavior.
+
 [![CI](https://github.com/manufaujdar/reflection-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/manufaujdar/reflection-ai/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
@@ -136,6 +139,8 @@ Contributions must use synthetic fixtures and preserve consent, isolation,
 deletion, provenance, evaluation, and rollback invariants. See
 [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md),
 [GOVERNANCE.md](GOVERNANCE.md), and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+The source-only privacy and self-hosting boundary is in
+[PRIVACY_AND_DATA_BOUNDARY.md](PRIVACY_AND_DATA_BOUNDARY.md).
 
 Run the complete local validation gate with:
 

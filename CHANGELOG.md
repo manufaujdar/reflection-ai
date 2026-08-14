@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added `PRIVACY_AND_DATA_BOUNDARY.md` to document the synthetic-only research boundary and distinguish the Apache-2.0 source license from deployment privacy obligations.
 - Added a responsive adaptive chatbot at `/chat` with consent-gated onboarding,
   persistent history, feedback/corrections, and a transparent personalization inspector.
 - Added user-scoped chat/session/style/agent-run database layers and an explicit
