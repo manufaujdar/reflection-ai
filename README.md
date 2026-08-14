@@ -1,6 +1,9 @@
 # Reflection AI
 
-A standalone framework for building an AI that progressively reflects an individual user's preferences, context, corrections, and working style. It separates fast, inspectable personalization from slower, evaluated model training.
+A consent-aware AI personalization and memory research framework. It supports an
+AI that progressively reflects an individual user's preferences, context,
+corrections, and working style while separating fast, inspectable
+personalization from slower, evaluated model training.
 
 ## Architecture
 
