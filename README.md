@@ -1,6 +1,21 @@
 # Reflection AI
 
-A standalone framework for building an AI that progressively reflects an individual user's preferences, context, corrections, and working style. It separates fast, inspectable personalization from slower, evaluated model training.
+Read the [documentation map](docs/README.md) before changing consent, memory,
+training, evaluation, or deployment behavior.
+
+[![CI](https://github.com/manufaujdar/reflection-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/manufaujdar/reflection-ai/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
+A standalone framework for building an AI that becomes more aligned with how an individual
+communicates and works as conversations accumulate. It learns immediately from explicit preferences,
+observable writing mechanics, and user corrections. With separate consent, positively rated examples
+can later enter offline, evaluation-gated adapter training. Every layer is inspectable, reversible,
+and subordinate to consent, safety, deletion, and rollback controls.
+
+Reflection AI is an alpha, local-first research framework. It is not production-ready,
+does not establish privacy or security compliance, and must not be used for
+high-impact decisions. Personalization records are revisable hypotheses backed by
+evidence—not authoritative facts about a person.
 
 ## Architecture
 
@@ -27,6 +42,13 @@ uvicorn --app-dir src reflection_ai.api:app --reload
 ```
 
 Open `http://localhost:8000/docs` for the interactive API.
+
+Open `http://localhost:8000/chat` for the adaptive chatbot. It walks through a
+consent-gated onboarding flow, learns explicit preferences and low-risk observable
+writing mechanics, persists conversation history, accepts feedback/corrections,
+and exposes a personalization inspector with memory provenance and agent traces.
+See [docs/adaptive-chatbot.md](docs/adaptive-chatbot.md) for the architecture and
+production boundaries.
 
 Open `http://localhost:8000/` for a minimal synthetic research console that can
 create, exercise, and delete a local test subject. It is intentionally labeled as
@@ -74,6 +96,9 @@ port to other machines.
 - `providers.py`: mock and OpenAI-compatible inference adapters
 - `services.py`: profile learning, prompt personalization, dataset preparation
 - `personalization.py`: immutable evidence, proposals, typed memory, retrieval, context compilation, retention and redaction
+- `chat/`: onboarding, chat persistence, observable-style learning, schemas, agent harness and API routes
+- `frontend/`: responsive chatbot, onboarding flow, feedback controls and personalization inspector
+- `slm/`: optional causal reference model, byte tokenizer, low-rank adapters and local experimental trainer
 - `domain/`: framework-independent memory, evidence, artifact, temporal and policy models
 - `engine/`: runnable local job, vector, graph, consolidation, retrieval, evaluation, registry and training baselines
 - `adapters/`: infrastructure-to-domain translators, beginning with SQLAlchemy
@@ -83,6 +108,8 @@ port to other machines.
 - `docs/open-source-landscape.md`: research review and prioritized design lessons
 - `docs/implementation-roadmap.md`: phased plan for memory, reflection, evaluation, and model learning
 - `docs/personalization-core.md`: implemented trust, lifecycle and API invariants
+- `docs/adaptive-chatbot.md`: chatbot layers, agent harness, immediate/memory/training loops and API
+- `docs/reference-slm.md`: supplied-model assessment, enhanced reference architecture and safe training boundary
 - `docs/authentication-tenant-contract.md`: Privacy- and Security-accepted fail-closed
   identity, tenant, consent, deletion, and abuse-test contract; not yet implemented
 - `docs/engine-building-blocks.md`: original local baselines and production replacement contracts
@@ -90,6 +117,11 @@ port to other machines.
 - `.agents/skills/`: validated Planner, Builder, Engineer, Reviewer, QA, Release, Documentation, R&D, Marketing, Design, Privacy, Security, Evaluation, and Retro skills
 - `memory.py`: optional adapters that reuse maintained Mem0 and Hindsight clients
 - `THIRD_PARTY_NOTICES.md`: dependency, license, and reuse inventory
+- `VALIDATION_PROTOCOL.md`: minimum evidence and release gates for personalization changes
+- `MODEL_CARD_TEMPLATE.md` and `DATASET_CARD_TEMPLATE.md`: provenance-first review templates
+- `COMPLIANCE_AND_DEPLOYMENT.md`: explicit research and production boundary
+- `PROVENANCE.md`: source, model, dataset, service, and artifact traceability rules
+- `tools/project_agent/`: deterministic local repository and console audit
 - `archive/`: inactive integration research retained for possible future use
 
 Install an optional open-source memory backend without copying its internal implementation:
@@ -100,7 +132,36 @@ pip install -e '.[memory-mem0]'
 pip install -e '.[memory-hindsight]'
 ```
 
+Install the experimental local SLM components separately:
+
+```bash
+pip install -e '.[slm]'
+```
+
+The reference SLM is not automatically routed to the chatbot. Adapter artifacts
+must still pass the existing consent, evaluation, registry, promotion, and rollback gates.
+
 Reflection AI runs independently. Its HTTP and Python boundaries remain generic so future clients can be added without coupling the core to any particular application.
+
+## Open-source governance
+
+Source code is licensed under Apache-2.0. See [LICENSE](LICENSE), [NOTICE](NOTICE),
+and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Public source availability
+does not license external datasets, model weights, hosted services, or optional
+provider assets.
+
+Contributions must use synthetic fixtures and preserve consent, isolation,
+deletion, provenance, evaluation, and rollback invariants. See
+[CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md),
+[GOVERNANCE.md](GOVERNANCE.md), and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+The source-only privacy and self-hosting boundary is in
+[PRIVACY_AND_DATA_BOUNDARY.md](PRIVACY_AND_DATA_BOUNDARY.md).
+
+Run the complete local validation gate with:
+
+```bash
+make validate
+```
 
 ## Production next steps
 

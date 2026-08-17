@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'">
+  <title>Reflection · Adaptive chat</title>
+  <link rel="stylesheet" href="/chat-assets/chat.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/chat" aria-label="Reflection home">
+        <span class="brand-mark" aria-hidden="true">R</span>
+        <span><strong>Reflection</strong><small>Adaptive personal AI</small></span>
+      </a>
+      <div class="status-wrap">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="model-status">Local research mode</span>
+      </div>
+      <button id="inspector-toggle" class="ghost-button" type="button" aria-expanded="false" aria-controls="inspector">How I adapt</button>
+    </header>
+
+    <main class="workspace">
+      <section id="welcome" class="welcome-panel" aria-labelledby="welcome-title">
+        <div class="eyebrow">Your preferences. Your corrections. Your control.</div>
+        <h1 id="welcome-title">The more you talk, the more Reflection works like you do.</h1>
+        <p class="lede">Reflection learns how you prefer to communicate and get things done. Each conversation can refine its tone, detail, structure, recurring preferences, and writing cadence—while keeping you in control of what it remembers.</p>
+        <div class="learning-story" aria-label="How Reflection becomes more personal over time">
+          <div><strong>It starts with what you tell it</strong><span>Your onboarding answers become explicit, inspectable preferences.</span></div>
+          <div><strong>It adapts as you talk</strong><span>Your observable writing style and corrections shape future responses immediately.</span></div>
+          <div><strong>It can improve more deeply</strong><span>Only with separate permission, positively rated examples can enter offline, evaluation-gated model training.</span></div>
+        </div>
+        <form id="start-form" class="start-card">
+          <label for="display-id">Local profile name</label>
+          <input id="display-id" name="display-id" maxlength="80" autocomplete="off" placeholder="For example: my-workspace" required>
+          <label class="check-row">
+            <input id="consent" type="checkbox" required>
+            <span>I agree to store my answers and chats locally for personalization.</span>
+          </label>
+          <label class="check-row muted">
+            <input id="training-consent" type="checkbox">
+            <span>Allow positively rated examples in future evaluation-gated training datasets (optional).</span>
+          </label>
+          <button class="primary-button" type="submit">Begin setup <span aria-hidden="true">→</span></button>
+          <p class="trust-note">Research build: no authentication or encryption. Do not enter real confidential, clinical, financial, or identifying information.</p>
+        </form>
+      </section>
+
+      <section id="onboarding" class="onboarding-panel hidden" aria-labelledby="question-title">
+        <div class="progress-meta"><span id="progress-label">Question 1 of 7</span><button id="erase-onboarding" class="text-button danger" type="button">Erase profile</button></div>
+        <div class="progress-track" aria-hidden="true"><span id="progress-bar"></span></div>
+        <article class="question-card">
+          <div class="assistant-orb" aria-hidden="true">R</div>
+          <p class="eyebrow">A quick preference</p>
+          <h2 id="question-title"></h2>
+          <form id="answer-form">
+            <div id="answer-control"></div>
+            <div class="question-actions">
+              <button id="skip-answer" class="ghost-button" type="button">Skip</button>
+              <button class="primary-button" type="submit">Continue <span aria-hidden="true">→</span></button>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <section id="chat" class="chat-panel hidden" aria-label="Conversation">
+        <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+        <div class="composer-wrap">
+          <form id="composer" class="composer">
+            <label class="sr-only" for="message-input">Message Reflection</label>
+            <textarea id="message-input" rows="1" maxlength="20000" placeholder="Ask Reflection anything…" required></textarea>
+            <button id="send-button" class="send-button" type="submit" aria-label="Send message">↑</button>
+          </form>
+          <p>Reflection can be wrong. Review important information and manage learned memory in the inspector.</p>
+        </div>
+      </section>
+
+      <aside id="inspector" class="inspector" aria-labelledby="inspector-title" aria-hidden="true">
+        <div class="inspector-head">
+          <div><p class="eyebrow">Transparent adaptation</p><h2 id="inspector-title">What Reflection learned</h2></div>
+          <button id="inspector-close" class="icon-button" type="button" aria-label="Close inspector">×</button>
+        </div>
+        <div class="inspector-body">
+          <section>
+            <div class="section-heading"><h3>Learning loop</h3><span id="learning-badge" class="state-badge">Checking</span></div>
+            <p id="learning-summary" class="muted">Loading consent and readiness…</p>
+            <div class="readiness-track" aria-hidden="true"><span id="readiness-bar"></span></div>
+            <p id="readiness-label" class="readiness-label"></p>
+            <label class="toggle-row" for="learning-toggle">
+              <span><strong>Learn from new chats</strong><small>Pausing keeps approved memory available.</small></span>
+              <input id="learning-toggle" type="checkbox" role="switch">
+            </label>
+            <div id="model-details" class="model-details"></div>
+          </section>
+          <section><h3>Writing mechanics</h3><p id="style-summary" class="muted">No conversation samples yet.</p><div id="style-list" class="chip-list"></div></section>
+          <section><h3>Explicit memory</h3><p class="muted">Only onboarding answers and your corrections become durable memory. You can forget any item.</p><div id="memory-list" class="memory-list"></div></section>
+          <section><h3>Latest agent run</h3><div id="trace-list" class="trace-list"></div></section>
+          <section class="control-zone"><h3>Your controls</h3><button id="erase-data" class="danger-button" type="button">Delete all my data</button></section>
+        </div>
+      </aside>
+    </main>
+    <dialog id="correction-dialog" class="correction-dialog" aria-labelledby="correction-title">
+      <form id="correction-form" method="dialog">
+        <p class="eyebrow">Explicit correction</p>
+        <h2 id="correction-title">What should I do differently?</h2>
+        <p class="muted">This becomes evidence-backed behavior memory. Avoid private or sensitive information.</p>
+        <label for="correction-input">Correction</label>
+        <textarea id="correction-input" rows="4" maxlength="10000" required></textarea>
+        <div class="question-actions">
+          <button id="correction-cancel" class="ghost-button" type="button">Cancel</button>
+          <button class="primary-button" type="submit">Save correction</button>
+        </div>
+      </form>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="/chat-assets/chat.js" defer></script>
+</body>
+</html>

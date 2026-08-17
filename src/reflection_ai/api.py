@@ -1,13 +1,18 @@
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from reflection_ai.config import get_settings
+from reflection_ai.chat.models import AgentRun, ChatMessage, ChatSession, OnboardingAnswer, StyleProfile
+from reflection_ai.chat.orchestrator import ChatOrchestrator
+from reflection_ai.chat.router import build_chat_router
 from reflection_ai.db import (
     Evidence,
     Event,
@@ -75,11 +80,28 @@ memory_service = MemoryService()
 reflection = ReflectionService(memory_service)
 context_compiler = ContextCompiler()
 retention = RetentionService()
+chat = ChatOrchestrator(
+    settings,
+    personalization.provider,
+    evidence_service,
+    memory_service,
+    reflection,
+    context_compiler,
+)
+app.include_router(build_chat_router(chat))
+
+CHAT_FRONTEND = Path(__file__).parent / "frontend"
+app.mount("/chat-assets", StaticFiles(directory=CHAT_FRONTEND), name="chat-assets")
 
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 def local_console() -> str:
     return CONSOLE_HTML
+
+
+@app.get("/chat", response_class=FileResponse, include_in_schema=False)
+def chat_frontend():
+    return CHAT_FRONTEND / "chat.html"
 
 
 def require_user(db: Session, user_id: str) -> User:
@@ -297,6 +319,11 @@ def delete_user(user_id: str, db: Session = Depends(get_db)):
     proposal_ids = list(
         db.scalars(select(ReflectionProposal.id).where(ReflectionProposal.user_id == user.id)).all()
     )
+    db.query(AgentRun).filter(AgentRun.user_id == user.id).delete()
+    db.query(ChatMessage).filter(ChatMessage.user_id == user.id).delete()
+    db.query(OnboardingAnswer).filter(OnboardingAnswer.user_id == user.id).delete()
+    db.query(ChatSession).filter(ChatSession.user_id == user.id).delete()
+    db.query(StyleProfile).filter(StyleProfile.user_id == user.id).delete()
     if memory_ids:
         db.query(MemoryEvidence).filter(MemoryEvidence.memory_id.in_(memory_ids)).delete(
             synchronize_session=False
@@ -317,6 +344,7 @@ def delete_user(user_id: str, db: Session = Depends(get_db)):
         db.delete(user.profile)
     db.delete(user)
     db.commit()
+    training.delete_subject_artifacts(user_id)
 
 
 @app.post("/v1/users/{user_id}/events", response_model=EventView, status_code=201)

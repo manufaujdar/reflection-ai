@@ -1,0 +1,14 @@
+{
+  "name": "letta",
+  "repository": "https://github.com/letta-ai/letta",
+  "commit": "b76da9092518cbaa2d09042e52fdcbde69243e18",
+  "branch": "main",
+  "commit_date": "2026-07-03T11:53:39-07:00",
+  "generated_at": "2026-07-15T10:31:16.941312+00:00",
+  "tracked_files": 1156,
+  "text_lines": 367689,
+  "approximate_code_lines": 298751,
+  "bytes": 23216461,
+  "symbols": 8820,
+  "relevant_paths": 53
+}

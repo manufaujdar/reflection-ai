@@ -1,0 +1,14 @@
+{
+  "name": "khoj",
+  "repository": "https://github.com/khoj-ai/khoj",
+  "commit": "1e30154d1070c7b132f389638c008b490be1481b",
+  "branch": "master",
+  "commit_date": "2026-06-24T14:13:59-07:00",
+  "generated_at": "2026-07-15T10:31:26.161756+00:00",
+  "tracked_files": 701,
+  "text_lines": 133097,
+  "approximate_code_lines": 109954,
+  "bytes": 85089912,
+  "symbols": 3613,
+  "relevant_paths": 17
+}
