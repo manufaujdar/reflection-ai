@@ -1,7 +1,7 @@
 from datetime import timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Response
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -14,6 +14,8 @@ from reflection_ai.chat.schemas import (
     FeedbackCreate,
     FeedbackView,
     InspectorView,
+    LearningUpdate,
+    LearningView,
     MessageView,
     OnboardingAnswerCreate,
     OnboardingState,
@@ -21,7 +23,8 @@ from reflection_ai.chat.schemas import (
     SessionCreate,
     SessionView,
 )
-from reflection_ai.db import Profile, User, get_db, utcnow
+from reflection_ai.db import Event, Profile, TrainingRun, User, get_db, utcnow
+from reflection_ai.personalization import DomainNotFound
 
 
 router = APIRouter(prefix="/v1/chat", tags=["adaptive-chat"])
@@ -203,6 +206,20 @@ def build_chat_router(orchestrator: ChatOrchestrator) -> APIRouter:
             raise _error(error) from error
         style = db.get(StyleProfile, user.id)
         memories = orchestrator.memories.list_active(db, user.id)
+        positive_examples = db.scalar(
+            select(func.count(Event.id)).where(
+                Event.user_id == user.id,
+                Event.feedback > 0,
+                Event.input_text.is_not(None),
+                Event.output_text.is_not(None),
+            )
+        ) or 0
+        latest_training = db.scalar(
+            select(TrainingRun)
+            .where(TrainingRun.user_id == user.id)
+            .order_by(TrainingRun.created_at.desc())
+            .limit(1)
+        )
         runs = list(
             db.scalars(
                 select(AgentRun)
@@ -220,6 +237,23 @@ def build_chat_router(orchestrator: ChatOrchestrator) -> APIRouter:
                 "metrics": style.metrics if style else {},
                 "instructions": style.instructions if style else [],
                 "safe_scope": "observable writing mechanics only",
+            },
+            learning={
+                "immediate_mode": "evidence-backed memory and observable style",
+                "enabled": orchestrator.learning_enabled(user),
+                "personalization_consent": user.consent,
+                "training_consent": user.training_consent,
+                "positive_examples": positive_examples,
+                "minimum_examples": orchestrator.settings.training_min_events,
+                "dataset_ready": bool(
+                    user.training_consent
+                    and positive_examples >= orchestrator.settings.training_min_events
+                ),
+                "latest_training_status": latest_training.status if latest_training else "not_run",
+                "live_provider": orchestrator.settings.model_provider,
+                "live_model": orchestrator.settings.model_name,
+                "reference_slm": "optional_experiment_not_routed",
+                "promotion_required": True,
             },
             memories=[
                 {
@@ -244,6 +278,32 @@ def build_chat_router(orchestrator: ChatOrchestrator) -> APIRouter:
             ],
         )
 
+    @router.patch("/sessions/{session_id}/learning", response_model=LearningView)
+    def update_learning(
+        session_id: str, body: LearningUpdate, db: Session = Depends(get_db)
+    ):
+        try:
+            session = orchestrator.require_session(db, session_id)
+            user = orchestrator.require_user(db, session.user_id)
+        except ChatNotFound as error:
+            raise _error(error) from error
+        user.attributes = {**user.attributes, "learning_enabled": body.enabled}
+        db.add(user)
+        db.commit()
+        return LearningView(enabled=body.enabled)
+
+    @router.delete("/sessions/{session_id}/memories/{memory_id}")
+    def forget_memory(session_id: str, memory_id: str, db: Session = Depends(get_db)):
+        try:
+            session = orchestrator.require_session(db, session_id)
+            user = orchestrator.require_user(db, session.user_id)
+            memory = orchestrator.memories.revoke(
+                db, user, memory_id, "User-requested revocation from chat inspector"
+            )
+        except (ChatNotFound, DomainNotFound) as error:
+            raise HTTPException(404, "Memory not found") from error
+        return {"id": memory.id, "status": memory.status}
+
     @router.delete("/sessions/{session_id}", status_code=204)
     def archive_session(session_id: str, db: Session = Depends(get_db)):
         try:
@@ -263,6 +323,10 @@ def build_chat_router(orchestrator: ChatOrchestrator) -> APIRouter:
             "explicit_memory": True,
             "observable_style_learning": True,
             "agent_run_traces": True,
+            "learning_readiness_inspector": True,
+            "individual_memory_revocation": True,
+            "optional_reference_slm": True,
+            "adapter_only_personalization": True,
             "provider_agnostic": True,
             "weight_training_inline": False,
             "weight_training_reason": "requires consent, offline evaluation, promotion, and rollback",

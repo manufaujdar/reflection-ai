@@ -344,6 +344,7 @@ def delete_user(user_id: str, db: Session = Depends(get_db)):
         db.delete(user.profile)
     db.delete(user)
     db.commit()
+    training.delete_subject_artifacts(user_id)
 
 
 @app.post("/v1/users/{user_id}/events", response_model=EventView, status_code=201)

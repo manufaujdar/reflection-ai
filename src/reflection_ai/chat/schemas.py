@@ -78,9 +78,18 @@ class FeedbackView(BaseModel):
     learned: bool
 
 
+class LearningUpdate(BaseModel):
+    enabled: bool
+
+
+class LearningView(BaseModel):
+    enabled: bool
+
+
 class InspectorView(BaseModel):
     user_id: str
     learning_enabled: bool
     style: dict[str, Any]
+    learning: dict[str, Any]
     memories: list[dict[str, Any]]
     recent_agent_runs: list[dict[str, Any]]

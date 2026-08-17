@@ -6,6 +6,7 @@ Reflection AI currently does not vendor source files from the reviewed repositor
 |---|---|---|---|
 | Mem0 (`mem0ai`) | Optional memory backend | Apache License 2.0 | https://github.com/mem0ai/mem0 |
 | Hindsight (`hindsight-client`) | Optional retain/recall backend | MIT License | https://github.com/vectorize-io/hindsight |
+| PyTorch (`torch`) | Optional reference SLM and adapter training runtime | Upstream license | https://github.com/pytorch/pytorch |
 
 Projects reviewed but not distributed as dependencies or copied into the runtime:
 

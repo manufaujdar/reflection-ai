@@ -72,6 +72,11 @@ training consent exists. Training stays asynchronous and promotion-gated: a futu
 must train on a split dataset, beat the current candidate on personalization and safety evaluations,
 and retain rollback. No request fine-tunes model weights inline.
 
+Prepared datasets are stored outside the relational database under an opaque, hashed subject scope.
+Each run contains redacted chronological train/holdout splits plus a manifest and hashes. Deleting the
+subject deletes this artifact scope as well as database records. The local storage adapter is a
+development baseline; production requires encrypted, tenant-scoped object storage.
+
 ## Database tables
 
 - `chat_sessions`: onboarding and active conversation lifecycle.
@@ -92,8 +97,14 @@ reflection proposals, interaction events, and training runs.
 - `GET /v1/chat/sessions/{id}/messages` — load the persisted transcript.
 - `POST /v1/chat/messages/{id}/feedback` — rate or explicitly correct an answer.
 - `GET /v1/chat/sessions/{id}/personalization` — inspect style, memory, provenance, and traces.
+- `PATCH /v1/chat/sessions/{id}/learning` — pause or resume new learning without deleting memory.
+- `DELETE /v1/chat/sessions/{id}/memories/{memory_id}` — revoke one owned memory.
 - `DELETE /v1/users/{id}` — delete the subject and every chatbot/core learning layer.
 - `GET /v1/chat/capabilities` — inspect implemented features and explicit limitations.
+
+The inspector also reports positive-example progress, separate training consent,
+dataset readiness, the live provider/model, and that the optional reference SLM is
+experimental and not routed. See `reference-slm.md` for its design and limitations.
 
 ## Production integration boundary
 

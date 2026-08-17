@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Expanded the site narrative to explain how Reflection progressively adapts through explicit
+  preferences, observable style, corrections, and separately consented offline training.
+- Added subject-scoped dataset storage with atomic writes, restrictive permissions, train/holdout
+  hashes, manifests, and deletion cleanup.
+- Added a prepared-run model coordinator and runtime personalization strength for controlled
+  base-versus-adapter evaluation without enabling inline training or live routing.
+- Added an atomic, versioned base-checkpoint envelope with configuration and file provenance.
+- Added an optional enhanced causal reference SLM with shifted loss, padding-aware
+  attention, validated sampling, tied weights, low-rank personalization adapters,
+  adapter-only export, and an evaluation-gated local training backend.
+- Expanded the chatbot inspector with learning pause/resume, per-memory revocation,
+  dataset-readiness progress, live-provider status, and an accessible correction dialog.
 - Added `PRIVACY_AND_DATA_BOUNDARY.md` to document the synthetic-only research boundary and distinguish the Apache-2.0 source license from deployment privacy obligations.
 - Added a responsive adaptive chatbot at `/chat` with consent-gated onboarding,
   persistent history, feedback/corrections, and a transparent personalization inspector.

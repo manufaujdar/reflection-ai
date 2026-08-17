@@ -6,8 +6,9 @@ Recommended reading order:
 2. [`architecture.md`](architecture.md), [`personalization-core.md`](personalization-core.md),
    and [`authentication-tenant-contract.md`](authentication-tenant-contract.md) —
    system and privacy/security contracts.
-3. [`adaptive-chatbot.md`](adaptive-chatbot.md), [`engine-building-blocks.md`](engine-building-blocks.md),
-   and [`implementation-roadmap.md`](implementation-roadmap.md) — product and engineering scope.
+3. [`adaptive-chatbot.md`](adaptive-chatbot.md), [`reference-slm.md`](reference-slm.md),
+   [`engine-building-blocks.md`](engine-building-blocks.md), and
+   [`implementation-roadmap.md`](implementation-roadmap.md) — product and engineering scope.
 4. [`../PRIVACY_AND_DATA_BOUNDARY.md`](../PRIVACY_AND_DATA_BOUNDARY.md),
    [`../PROVENANCE.md`](../PROVENANCE.md), and [`../THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md)
    — data, provenance, and external rights.

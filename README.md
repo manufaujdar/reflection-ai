@@ -6,7 +6,11 @@ training, evaluation, or deployment behavior.
 [![CI](https://github.com/manufaujdar/reflection-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/manufaujdar/reflection-ai/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-A standalone framework for building an AI that progressively reflects an individual user's preferences, context, corrections, and working style. It separates fast, inspectable personalization from slower, evaluated model training.
+A standalone framework for building an AI that becomes more aligned with how an individual
+communicates and works as conversations accumulate. It learns immediately from explicit preferences,
+observable writing mechanics, and user corrections. With separate consent, positively rated examples
+can later enter offline, evaluation-gated adapter training. Every layer is inspectable, reversible,
+and subordinate to consent, safety, deletion, and rollback controls.
 
 Reflection AI is an alpha, local-first research framework. It is not production-ready,
 does not establish privacy or security compliance, and must not be used for
@@ -94,6 +98,7 @@ port to other machines.
 - `personalization.py`: immutable evidence, proposals, typed memory, retrieval, context compilation, retention and redaction
 - `chat/`: onboarding, chat persistence, observable-style learning, schemas, agent harness and API routes
 - `frontend/`: responsive chatbot, onboarding flow, feedback controls and personalization inspector
+- `slm/`: optional causal reference model, byte tokenizer, low-rank adapters and local experimental trainer
 - `domain/`: framework-independent memory, evidence, artifact, temporal and policy models
 - `engine/`: runnable local job, vector, graph, consolidation, retrieval, evaluation, registry and training baselines
 - `adapters/`: infrastructure-to-domain translators, beginning with SQLAlchemy
@@ -104,6 +109,7 @@ port to other machines.
 - `docs/implementation-roadmap.md`: phased plan for memory, reflection, evaluation, and model learning
 - `docs/personalization-core.md`: implemented trust, lifecycle and API invariants
 - `docs/adaptive-chatbot.md`: chatbot layers, agent harness, immediate/memory/training loops and API
+- `docs/reference-slm.md`: supplied-model assessment, enhanced reference architecture and safe training boundary
 - `docs/authentication-tenant-contract.md`: Privacy- and Security-accepted fail-closed
   identity, tenant, consent, deletion, and abuse-test contract; not yet implemented
 - `docs/engine-building-blocks.md`: original local baselines and production replacement contracts
@@ -125,6 +131,15 @@ pip install -e '.[memory-mem0]'
 # or
 pip install -e '.[memory-hindsight]'
 ```
+
+Install the experimental local SLM components separately:
+
+```bash
+pip install -e '.[slm]'
+```
+
+The reference SLM is not automatically routed to the chatbot. Adapter artifacts
+must still pass the existing consent, evaluation, registry, promotion, and rollback gates.
 
 Reflection AI runs independently. Its HTTP and Python boundaries remain generic so future clients can be added without coupling the core to any particular application.
 

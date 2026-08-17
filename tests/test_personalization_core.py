@@ -292,10 +292,18 @@ def test_training_dataset_is_redacted_hashed_and_chronologically_held_out(
     assert run["metrics"]["examples"] == 16
     assert run["metrics"]["holdout_examples"] == 4
     assert len(run["metrics"]["dataset_hash"]) == 64
+    assert len(run["metrics"]["holdout_hash"]) == 64
     assert run["metrics"]["promotion_required"] is True
+    assert user["id"] not in run["artifact_uri"]
+    assert Path(run["metrics"]["manifest_uri"]).is_file()
     content = Path(run["artifact_uri"]).read_text(encoding="utf-8")
     assert "private-" not in content
     assert "[REDACTED]" in content
+
+    scope = Path(run["artifact_uri"]).parents[1]
+    deleted = client.delete(f"/v1/users/{user['id']}")
+    assert deleted.status_code == 204
+    assert not scope.exists()
 
 
 def test_unrelated_facts_are_not_injected(client):

@@ -5,6 +5,7 @@ const state = {
   userId: localStorage.getItem("reflection.user"),
   question: null,
   sending: false,
+  correctionMessageId: null,
 };
 
 const byId = (id) => document.getElementById(id);
@@ -122,10 +123,7 @@ function addFeedbackActions(container, messageId) {
   helpful.addEventListener("click", () => submitFeedback(messageId, 1));
   const improve = element("button", "", "Correct this");
   improve.type = "button";
-  improve.addEventListener("click", () => {
-    const correction = window.prompt("What should Reflection do differently next time?");
-    if (correction) submitFeedback(messageId, -1, correction);
-  });
+  improve.addEventListener("click", () => openCorrection(messageId));
   actions.append(helpful, improve);
   container.append(actions);
 }
@@ -164,6 +162,10 @@ async function sendMessage(text) {
   byId("send-button").disabled = true;
   const temporary = {id: crypto.randomUUID(), role: "user", content: text};
   addMessage(temporary, false);
+  const pendingId = crypto.randomUUID();
+  addMessage({id: pendingId, role: "assistant", content: "Thinking"}, false);
+  const pendingNode = messages.querySelector(`[data-message-id="${pendingId}"]`);
+  if (pendingNode) pendingNode.classList.add("pending");
   try {
     const result = await api(`/v1/chat/sessions/${state.sessionId}/messages`, {
       method: "POST",
@@ -171,14 +173,23 @@ async function sendMessage(text) {
     });
     const tempNode = messages.querySelector(`[data-message-id="${temporary.id}"]`);
     if (tempNode) tempNode.dataset.messageId = result.user_message.id;
+    if (pendingNode) pendingNode.remove();
     addMessage(result.assistant_message);
     refreshInspector();
   } catch (error) {
+    if (pendingNode) pendingNode.remove();
     showToast(error.message);
   } finally {
     state.sending = false;
     byId("send-button").disabled = false;
   }
+}
+
+function openCorrection(messageId) {
+  state.correctionMessageId = messageId;
+  byId("correction-input").value = "";
+  byId("correction-dialog").showModal();
+  byId("correction-input").focus();
 }
 
 async function submitFeedback(messageId, rating, correction = null) {
@@ -195,6 +206,31 @@ async function submitFeedback(messageId, rating, correction = null) {
 function renderInspector(data) {
   state.userId = data.user_id;
   localStorage.setItem("reflection.user", data.user_id);
+  const readiness = Math.min(
+    100,
+    Math.round((data.learning.positive_examples / data.learning.minimum_examples) * 100),
+  );
+  byId("learning-badge").textContent = data.learning.enabled ? "Learning on" : "Paused";
+  byId("learning-badge").classList.toggle("active", data.learning.enabled);
+  byId("learning-summary").textContent = data.learning.training_consent
+    ? "Immediate memory learning is separate from evaluation-gated weight training."
+    : "Immediate personalization is active; model-weight training has no consent.";
+  byId("readiness-bar").style.width = `${readiness}%`;
+  byId("readiness-label").textContent = `${data.learning.positive_examples} of ${data.learning.minimum_examples} positively rated examples for dataset readiness`;
+  byId("learning-toggle").checked = data.learning.enabled;
+  byId("model-status").textContent = `${data.learning.live_provider} · ${data.learning.live_model}`;
+  const modelDetails = byId("model-details");
+  clearChildren(modelDetails);
+  [
+    ["Current response path", "Memory + provider"],
+    ["Dataset", data.learning.dataset_ready ? "Ready to prepare" : "Not ready"],
+    ["Latest training run", data.learning.latest_training_status],
+    ["Reference SLM", "Experimental · not routed"],
+  ].forEach(([label, value]) => {
+    const row = element("div", "model-detail");
+    row.append(element("span", "", label), element("strong", "", value));
+    modelDetails.append(row);
+  });
   byId("style-summary").textContent = data.style.sample_count
     ? `${data.style.sample_count} writing sample${data.style.sample_count === 1 ? "" : "s"} · profile v${data.style.version}`
     : "No conversation samples yet.";
@@ -206,7 +242,12 @@ function renderInspector(data) {
   if (!data.memories.length) memoryList.append(element("p", "muted", "Nothing retained yet."));
   data.memories.forEach((memory) => {
     const item = element("div", "memory-item");
-    item.append(element("strong", "", `${memory.type} · ${memory.explicit ? "explicit" : "inferred"}`), element("span", "", memory.content));
+    const copy = element("div", "memory-copy");
+    copy.append(element("strong", "", `${memory.type} · ${memory.explicit ? "explicit" : "inferred"}`), element("span", "", memory.content));
+    const forget = element("button", "forget-button", "Forget");
+    forget.type = "button";
+    forget.addEventListener("click", () => forgetMemory(memory.id));
+    item.append(copy, forget);
     memoryList.append(item);
   });
   const trace = byId("trace-list");
@@ -214,6 +255,29 @@ function renderInspector(data) {
   const latest = data.recent_agent_runs[0];
   if (!latest) trace.append(element("span", "muted", "No agent run yet."));
   else latest.trace.stages.forEach((stage) => trace.append(element("div", "trace-step", stage.replaceAll("-", " "))));
+}
+
+async function forgetMemory(memoryId) {
+  if (!window.confirm("Forget this memory? Its audit history remains, but it will stop affecting responses.")) return;
+  try {
+    await api(`/v1/chat/sessions/${state.sessionId}/memories/${memoryId}`, {method: "DELETE"});
+    showToast("Memory revoked");
+    refreshInspector();
+  } catch (error) { showToast(error.message); }
+}
+
+async function setLearning(enabled) {
+  try {
+    await api(`/v1/chat/sessions/${state.sessionId}/learning`, {
+      method: "PATCH",
+      body: JSON.stringify({enabled}),
+    });
+    showToast(enabled ? "Learning resumed" : "New learning paused");
+    refreshInspector();
+  } catch (error) {
+    byId("learning-toggle").checked = !enabled;
+    showToast(error.message);
+  }
 }
 
 async function refreshInspector() {
@@ -279,8 +343,18 @@ byId("message-input").addEventListener("input", (event) => {
 });
 byId("inspector-toggle").addEventListener("click", () => setInspector(!byId("inspector").classList.contains("open")));
 byId("inspector-close").addEventListener("click", () => setInspector(false));
+byId("learning-toggle").addEventListener("change", (event) => setLearning(event.target.checked));
 byId("erase-data").addEventListener("click", eraseAllData);
 byId("erase-onboarding").addEventListener("click", eraseAllData);
+byId("correction-cancel").addEventListener("click", () => byId("correction-dialog").close());
+byId("correction-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const correction = byId("correction-input").value.trim();
+  if (!correction || !state.correctionMessageId) return;
+  byId("correction-dialog").close();
+  submitFeedback(state.correctionMessageId, -1, correction);
+  state.correctionMessageId = null;
+});
 
 (async function restore() {
   if (!state.sessionId) return;
