@@ -47,3 +47,13 @@
 - Security gate: no new production trust claim; existing missing authentication remains a release blocker.
 - QA gate: synthetic desktop/mobile interaction evidence is ready; independent release approval remains pending.
 - Next action: add authenticated tenant identity, durable orchestration, a pretrained base/tokenizer, and an evaluator/registry implementation before enabling any model candidate in live routing.
+
+
+## Completed local tooling — Spec Kit (2026-10-03)
+
+Pinned v1.1.0 core + bug/assess Codex skills installed. Read .specify/INTEGRATION.md;
+existing tracker/role/privacy/human gates retain authority. Hashes, 18 commands,
+links, JSON, Bash and local-root checks pass; disposable feature/plan/tasks and
+external/traversal/symlink negative checks pass. No application/runtime or hosted
+change. Active role: local tooling release/handoff. Next owner: selected project
+product/engineering owner for an authorized task. Existing approval gates apply.
