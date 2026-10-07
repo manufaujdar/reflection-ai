@@ -19,3 +19,9 @@ Use `.ai/HANDOFF.md` only for active project work. `.ai/MEMORY.md` stores projec
 Read `.ai/TEAM.md` before multi-role or idea-to-release work. Use its explicit
 gears and keep the task contract in `.ai/HANDOFF.md`; consent, isolation,
 deletion, evaluation, and rollback invariants remain authoritative.
+
+## Shared AI-agent resources
+
+When a task needs a shared role or resource, read [MASTER_AI_AGENTS.md](MASTER_AI_AGENTS.md).
+Select only the relevant definition. Existing project roles, scoped instructions,
+data boundaries, source-of-truth records, and release gates retain authority.
