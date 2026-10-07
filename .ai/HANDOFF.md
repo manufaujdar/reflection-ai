@@ -57,3 +57,14 @@ links, JSON, Bash and local-root checks pass; disposable feature/plan/tasks and
 external/traversal/symlink negative checks pass. No application/runtime or hosted
 change. Active role: local tooling release/handoff. Next owner: selected project
 product/engineering owner for an authorized task. Existing approval gates apply.
+
+
+## Oil UI local pass — 2026-10-07
+
+- Objective: implement minimal UI/UX corrections under the authorized portfolio request; existing trackers and unrelated work preserved.
+- Files: src/reflection_ai/frontend/chat.html; chat.js; chat.css.
+- Result: Preserve busy/failed drafts, guard IME Enter, native modal inspector focus/return, onboarding labels and narrow controls.
+- Verification: 19 chat/API tests, JS syntax and synthetic drafts/native-modal/reflow pass.
+- Coverage/limits: Full onboarding, correction/nested-dialog and screen-reader/device journeys remain pending; auth/tenant contract unchanged.
+- Evidence and upstream provenance: [portfolio report](../../UI_UX_REVIEW_2026-10-07.md), [Oil UI method/helper](../../resources/code-review/OIL_UI_REVIEW.md). This is an affected UI slice, not a renewed whole-repository audit.
+- Active gear: release review. Next owner: Experience/Chat owner. No new approval pending for these local edits; existing release/governance gates remain. No commit, push, deployment, provider call or publication.

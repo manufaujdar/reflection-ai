@@ -83,6 +83,7 @@ function renderQuestion(data) {
     const input = element("textarea", "answer-text");
     input.name = "answer";
     input.id = "text-answer";
+    input.setAttribute("aria-labelledby", "question-title");
     input.maxLength = 5000;
     input.required = true;
     input.placeholder = state.question.optional ? "Type an answer, or skip" : "Type your answer";
@@ -178,6 +179,9 @@ async function sendMessage(text) {
     refreshInspector();
   } catch (error) {
     if (pendingNode) pendingNode.remove();
+    const failed = messages.querySelector(`[data-message-id="${temporary.id}"]`);
+    if (failed) failed.append(element("p", "send-error", "Not sent. Retry from the message box."));
+    if (!byId("message-input").value) byId("message-input").value = text;
     showToast(error.message);
   } finally {
     state.sending = false;
@@ -289,8 +293,12 @@ async function refreshInspector() {
 function setInspector(open) {
   byId("inspector").classList.toggle("open", open);
   byId("inspector").setAttribute("aria-hidden", String(!open));
+  byId("inspector").inert = !open;
+  if (open && !byId("inspector").open) byId("inspector").showModal();
+  if (!open && byId("inspector").open) byId("inspector").close();
   byId("inspector-toggle").setAttribute("aria-expanded", String(open));
-  if (open) refreshInspector();
+  if (open) { byId("inspector-close").focus(); refreshInspector(); }
+  else byId("inspector-toggle").focus();
 }
 
 async function eraseAllData() {
@@ -330,12 +338,13 @@ byId("answer-form").addEventListener("submit", (event) => { event.preventDefault
 byId("skip-answer").addEventListener("click", () => submitAnswer(true));
 byId("composer").addEventListener("submit", (event) => {
   event.preventDefault();
+  if (state.sending) return;
   const input = byId("message-input");
   const text = input.value.trim();
   if (text) { input.value = ""; input.style.height = "auto"; sendMessage(text); }
 });
 byId("message-input").addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); byId("composer").requestSubmit(); }
+  if (event.key === "Enter" && !event.shiftKey && !event.isComposing) { event.preventDefault(); byId("composer").requestSubmit(); }
 });
 byId("message-input").addEventListener("input", (event) => {
   event.target.style.height = "auto";
@@ -343,6 +352,10 @@ byId("message-input").addEventListener("input", (event) => {
 });
 byId("inspector-toggle").addEventListener("click", () => setInspector(!byId("inspector").classList.contains("open")));
 byId("inspector-close").addEventListener("click", () => setInspector(false));
+byId("inspector").addEventListener("cancel", (event) => { event.preventDefault(); setInspector(false); });
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && byId("inspector").classList.contains("open") && !byId("correction-dialog").open) setInspector(false);
+});
 byId("learning-toggle").addEventListener("change", (event) => setLearning(event.target.checked));
 byId("erase-data").addEventListener("click", eraseAllData);
 byId("erase-onboarding").addEventListener("click", eraseAllData);

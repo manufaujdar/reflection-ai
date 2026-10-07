@@ -73,6 +73,7 @@ input[type="text"], input:not([type]), .start-card > input, textarea { color: va
 .choice input { position: absolute; opacity: 0; }
 .choice label { display: block; background: #0d1016; border: 1px solid var(--line); border-radius: 15px; padding: 15px 17px; color: #cdd2dc; }
 .choice input:checked + label { border-color: var(--accent); color: var(--text); background: var(--accent-dark); }
+.choice input:focus-visible + label { outline: 3px solid var(--accent); outline-offset: 3px; }
 .answer-text { width: 100%; min-height: 110px; resize: vertical; }
 .question-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
 
@@ -134,6 +135,7 @@ input[type="text"], input:not([type]), .start-card > input, textarea { color: va
 .toast { position: fixed; z-index: 50; left: 50%; bottom: 24px; transform: translate(-50%, 140%); background: #eef4e6; color: #13180e; padding: 10px 16px; border-radius: 12px; font-size: 13px; transition: transform .2s ease; }
 .toast.show { transform: translate(-50%, 0); }
 .pending .bubble { color: var(--muted); }
+.send-error { color: var(--danger); font-size: 14px; }
 .pending .bubble::after { content: ""; display: inline-block; width: 5px; height: 5px; margin-left: 8px; border-radius: 50%; background: var(--accent); box-shadow: 9px 0 var(--accent), 18px 0 var(--accent); animation: thinking 1s infinite alternate; }
 .correction-dialog { width: min(520px, calc(100% - 28px)); color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 22px; padding: 0; box-shadow: 0 28px 90px rgba(0,0,0,.6); }
 .correction-dialog::backdrop { background: rgba(3, 5, 8, .72); backdrop-filter: blur(5px); }
@@ -158,5 +160,19 @@ input[type="text"], input:not([type]), .start-card > input, textarea { color: va
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }
+
+.inspector { visibility: hidden; }
+.inspector.open { visibility: visible; }
+.inspector-head { flex-shrink: 0; }
+.inspector { display: flex; flex-direction: column; }
+.inspector-body { height: auto; min-height: 0; flex: 1; }
+.composer textarea { min-width: 0; }
+.send-button { flex-shrink: 0; }
+.message-actions button, .forget-button, .icon-button, .text-button { min-height: 44px; }
+.icon-button { min-width: 44px; }
+.memory-copy { overflow-wrap: anywhere; }
+.toast { max-width: calc(100% - 24px); overflow-wrap: anywhere; }
+a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.inspector{margin:0;padding:0;max-width:100%;height:calc(100dvh - 74px);max-height:none;border:0;border-left:1px solid var(--line);color:var(--text)}.inspector::backdrop{background:rgba(3,5,8,.45)}
