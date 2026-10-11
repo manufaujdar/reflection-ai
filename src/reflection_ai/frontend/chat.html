@@ -66,8 +66,9 @@
       </section>
 
       <section id="chat" class="chat-panel hidden" aria-label="Conversation">
-        <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+        <div id="messages" class="messages" tabindex="0" aria-label="Conversation messages" role="log" aria-live="polite" aria-relevant="additions"></div>
         <div class="composer-wrap">
+          <button id="jump-latest" class="ghost-button jump-latest" type="button" hidden>Jump to latest</button>
           <form id="composer" class="composer">
             <label class="sr-only" for="message-input">Message Reflection</label>
             <textarea id="message-input" rows="1" maxlength="20000" placeholder="Ask Reflection anything…" required></textarea>
@@ -83,6 +84,12 @@
           <button id="inspector-close" class="icon-button" type="button" aria-label="Close inspector">×</button>
         </div>
         <div class="inspector-body">
+          <p id="inspector-status" class="muted" role="status"></p>
+          <button id="inspector-retry" class="ghost-button" type="button" hidden>Retry refresh</button>
+          <section><h3>Chat preferences</h3>
+            <label class="toggle-row" for="enter-to-send"><span><strong>Enter to send</strong><small>Applies to this tab. Shift+Enter adds a new line; the Send button always works.</small></span><input id="enter-to-send" type="checkbox" role="switch" checked></label>
+            <p id="session-storage-status" class="muted" role="status"></p>
+          </section>
           <section>
             <div class="section-heading"><h3>Learning loop</h3><span id="learning-badge" class="state-badge">Checking</span></div>
             <p id="learning-summary" class="muted">Loading consent and readiness…</p>

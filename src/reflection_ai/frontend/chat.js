@@ -1,8 +1,15 @@
 "use strict";
 
+let storageAvailable = true;
+function storedSession() {
+  try { return {sessionId: localStorage.getItem("reflection.session"), userId: localStorage.getItem("reflection.user")}; }
+  catch (_) { storageAvailable = false; return {sessionId: null, userId: null}; }
+}
+
 const state = {
-  sessionId: localStorage.getItem("reflection.session"),
-  userId: localStorage.getItem("reflection.user"),
+  ...storedSession(),
+  unread: 0,
+  enterToSend: true,
   question: null,
   sending: false,
   correctionMessageId: null,
@@ -14,6 +21,38 @@ const onboarding = byId("onboarding");
 const chat = byId("chat");
 const messages = byId("messages");
 const toast = byId("toast");
+
+function saveSession() {
+  try {
+    for (const [key, value] of [["reflection.session", state.sessionId], ["reflection.user", state.userId]]) {
+      if (value) localStorage.setItem(key, value);
+      else localStorage.removeItem(key);
+    }
+    storageAvailable = true;
+  } catch (_) { storageAvailable = false; }
+  renderStorageStatus();
+}
+
+function renderStorageStatus() {
+  byId("session-storage-status").textContent = storageAvailable
+    ? "This browser stores session and profile IDs to resume. Chats and memory are kept by the local server."
+    : "Browser storage unavailable. This tab still works; resuming after it closes may be unavailable. Server data is still retained.";
+}
+renderStorageStatus();
+
+function nearLatest() {
+  return messages.scrollHeight - messages.clientHeight - messages.scrollTop <= 80;
+}
+
+function jumpLatest() {
+  messages.scrollTop = messages.scrollHeight;
+  state.unread = 0;
+  byId("jump-latest").hidden = true;
+}
+messages.addEventListener("scroll", () => {
+  if (nearLatest()) { state.unread = 0; byId("jump-latest").hidden = true; }
+});
+byId("jump-latest").addEventListener("click", () => { jumpLatest(); byId("message-input").focus({preventScroll: true}); });
 
 function showToast(text) {
   toast.textContent = text;
@@ -107,6 +146,7 @@ async function submitAnswer(skip = false) {
 }
 
 function renderEmptyChat() {
+  jumpLatest();
   clearChildren(messages);
   const empty = element("div", "empty-chat");
   empty.append(
@@ -130,6 +170,7 @@ function addFeedbackActions(container, messageId) {
 }
 
 function addMessage(message, feedback = true) {
+  const follow = nearLatest();
   const empty = messages.querySelector(".empty-chat");
   if (empty) empty.remove();
   const row = element("article", `message-row ${message.role}`);
@@ -138,7 +179,12 @@ function addMessage(message, feedback = true) {
   row.append(content);
   if (message.role === "assistant" && feedback) addFeedbackActions(content, message.id);
   messages.append(row);
-  messages.scrollTop = messages.scrollHeight;
+  if (follow) jumpLatest();
+  else {
+    state.unread += 1;
+    byId("jump-latest").textContent = `Jump to latest · ${state.unread} new`;
+    byId("jump-latest").hidden = false;
+  }
 }
 
 async function loadHistory() {
@@ -147,6 +193,7 @@ async function loadHistory() {
   else {
     clearChildren(messages);
     history.forEach((message) => addMessage(message));
+    jumpLatest();
   }
 }
 
@@ -209,7 +256,7 @@ async function submitFeedback(messageId, rating, correction = null) {
 
 function renderInspector(data) {
   state.userId = data.user_id;
-  localStorage.setItem("reflection.user", data.user_id);
+  saveSession();
   const readiness = Math.min(
     100,
     Math.round((data.learning.positive_examples / data.learning.minimum_examples) * 100),
@@ -222,6 +269,7 @@ function renderInspector(data) {
   byId("readiness-bar").style.width = `${readiness}%`;
   byId("readiness-label").textContent = `${data.learning.positive_examples} of ${data.learning.minimum_examples} positively rated examples for dataset readiness`;
   byId("learning-toggle").checked = data.learning.enabled;
+  byId("learning-toggle").disabled = false;
   byId("model-status").textContent = `${data.learning.live_provider} · ${data.learning.live_model}`;
   const modelDetails = byId("model-details");
   clearChildren(modelDetails);
@@ -286,8 +334,16 @@ async function setLearning(enabled) {
 
 async function refreshInspector() {
   if (!state.sessionId) return;
-  try { renderInspector(await api(`/v1/chat/sessions/${state.sessionId}/personalization`)); }
-  catch (_) { /* session may have been erased */ }
+  byId("inspector-status").textContent = "Refreshing personalization…";
+  byId("inspector-retry").hidden = true;
+  byId("learning-toggle").disabled = true;
+  try {
+    renderInspector(await api(`/v1/chat/sessions/${state.sessionId}/personalization`));
+    byId("inspector-status").textContent = "Personalization is up to date.";
+  } catch (_) {
+    byId("inspector-status").textContent = "Could not refresh personalization. Any displayed values may be out of date.";
+    byId("inspector-retry").hidden = false;
+  }
 }
 
 function setInspector(open) {
@@ -305,10 +361,9 @@ async function eraseAllData() {
   if (!state.userId || !window.confirm("Permanently delete this local profile, messages, memories, evidence, and traces?")) return;
   try {
     await api(`/v1/users/${state.userId}`, {method: "DELETE"});
-    localStorage.removeItem("reflection.session");
-    localStorage.removeItem("reflection.user");
     state.sessionId = null;
     state.userId = null;
+    saveSession();
     setInspector(false);
     showPanel(welcome);
     showToast("All profile data deleted");
@@ -328,8 +383,7 @@ byId("start-form").addEventListener("submit", async (event) => {
     });
     state.sessionId = session.id;
     state.userId = session.user_id;
-    localStorage.setItem("reflection.session", session.id);
-    localStorage.setItem("reflection.user", session.user_id);
+    saveSession();
     renderQuestion({progress: session.onboarding_index, total: session.onboarding_total, next_question: session.next_question, complete: session.status !== "onboarding"});
   } catch (error) { showToast(error.message); }
 });
@@ -344,7 +398,7 @@ byId("composer").addEventListener("submit", (event) => {
   if (text) { input.value = ""; input.style.height = "auto"; sendMessage(text); }
 });
 byId("message-input").addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && !event.shiftKey && !event.isComposing) { event.preventDefault(); byId("composer").requestSubmit(); }
+  if (event.key === "Enter" && state.enterToSend && !event.shiftKey && !event.isComposing) { event.preventDefault(); byId("composer").requestSubmit(); }
 });
 byId("message-input").addEventListener("input", (event) => {
   event.target.style.height = "auto";
@@ -356,6 +410,8 @@ byId("inspector").addEventListener("cancel", (event) => { event.preventDefault()
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && byId("inspector").classList.contains("open") && !byId("correction-dialog").open) setInspector(false);
 });
+byId("enter-to-send").addEventListener("change", event => { state.enterToSend = event.target.checked; });
+byId("inspector-retry").addEventListener("click", refreshInspector);
 byId("learning-toggle").addEventListener("change", (event) => setLearning(event.target.checked));
 byId("erase-data").addEventListener("click", eraseAllData);
 byId("erase-onboarding").addEventListener("click", eraseAllData);
@@ -379,7 +435,8 @@ byId("correction-form").addEventListener("submit", (event) => {
     } else if (session.status === "active") await enterChat();
     else showPanel(welcome);
   } catch (_) {
-    localStorage.removeItem("reflection.session");
-    localStorage.removeItem("reflection.user");
+    state.sessionId = null;
+    state.userId = null;
+    saveSession();
   }
 }());
