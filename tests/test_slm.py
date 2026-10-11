@@ -84,18 +84,26 @@ def test_personalization_freezes_base_and_exports_only_small_adapters():
 
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="install the slm extra for model tests")
-def test_personalization_strength_supports_base_comparison_and_fails_closed():
+@pytest.mark.parametrize("seed", [7, 11, 17])
+def test_personalization_strength_supports_base_comparison_and_fails_closed(seed):
     import torch
 
     from reflection_ai.slm.model import ReflectionSLM
 
-    model = ReflectionSLM(tiny_config()).eval()
+    # Keep this fixture independent of test order and initialization randomness.
+    with torch.random.fork_rng(devices=[]):
+        torch.manual_seed(seed)
+        model = ReflectionSLM(tiny_config()).eval()
     with torch.no_grad():
-        model.blocks[0].adapter.up.weight.fill_(0.05)
+        # Equal output rows only add a constant shift, removed by LayerNorm.
+        # A nonuniform adapter must produce a meaningful personalized change.
+        model.blocks[0].adapter.up.weight.zero_()
+        model.blocks[0].adapter.up.weight[0, 0] = 0.5
     tokens = torch.tensor([[1, 12, 13]])
     base_logits, _ = model(tokens, personalization_strength=0)
     personal_logits, _ = model(tokens, personalization_strength=1)
     assert not torch.allclose(base_logits, personal_logits)
+    assert (base_logits - personal_logits).abs().max().item() > 1e-3
     with pytest.raises(ValueError, match="strength"):
         model(tokens, personalization_strength=-1)
     with pytest.raises(ValueError, match="strength"):
