@@ -31,7 +31,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<9", "pytest-cov>=5,<7", "ruff>=0.8,<0.9"]
+browser = ["playwright==1.63.0"]
+quality = ["pip-audit==2.10.1"]
+dev = ["pytest>=9.0.3,<10", "pytest-cov>=5,<7", "ruff>=0.8,<0.9"]
 memory-mem0 = ["mem0ai>=2,<3"]
 memory-hindsight = ["hindsight-client>=0.8,<1"]
 memory = ["mem0ai>=2,<3", "hindsight-client>=0.8,<1"]

@@ -21,3 +21,6 @@ exports/
 *.pt
 *.pth
 *.safetensors
+
+# Local engineering-tool dependencies
+tools/docs-tools/node_modules/

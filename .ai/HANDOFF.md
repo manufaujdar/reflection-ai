@@ -83,3 +83,7 @@ product/engineering owner for an authorized task. Existing approval gates apply.
 ## Main consolidation — 11 October 2026
 
 User authorized consolidating the existing premium-scroll-settings branch into main. This normal merge includes its pre-existing adaptive chat, optional local SLM, governance and upstream research-index history; current-main README narrative and documentation are retained. A full-suite integration failure exposed delivery-team validation treating Spec Kit commands as team roles. The validator now excludes only documented speckit-* command directories; a regression still rejects malformed and unknown non-SpecKit roles. Final checks and remote SHA are recorded in the portfolio main-integration receipt. Synthetic/local tests do not authorize model promotion, provider runs, deployment or clinical use.
+
+## Main-push engineering tooling — 11 October 2026
+
+User authorized suitable tools and main-only publication. Active gear: engineering/build followed by independent Review and QA. Scope: repo-owned quality commands, workflow/docs/secret gates and synthetic browser regressions; no runtime policy, clinical/provider data, model run, deployment or hook replacement. Acceptance: native suites and new gates pass, representative failure paths reject, root review resolves findings, exact main push and hosted CI are verified. Tool pins/source/limitations are in TOOLING.md; transient evidence is in the portfolio tooling receipt. Next owner after publication: maintainer for governed release and physical-device approval.
