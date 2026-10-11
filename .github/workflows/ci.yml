@@ -24,6 +24,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - run: python -m pip install -e '.[dev,quality]'
+      - run: python -m pip check
       - run: python -m pip_audit --local
       - run: pytest
       - run: ruff check .
@@ -43,6 +44,7 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: python -m pip install -e '.[dev,slm,quality]'
+      - run: python -m pip check
       - run: python -m pip_audit --local
       - run: pytest -q tests/test_slm.py
 
