@@ -109,6 +109,9 @@ def load_skills() -> list[Skill]:
     if not SKILLS_ROOT.is_dir():
         raise ValueError(f"missing skills directory: {SKILLS_ROOT}")
     for folder in sorted(path for path in SKILLS_ROOT.iterdir() if path.is_dir()):
+        # Spec Kit commands use their own manifest rather than delivery-team metadata.
+        if folder.name.startswith("speckit-"):
+            continue
         skill_path = folder / "SKILL.md"
         ui_path = folder / "agents" / "openai.yaml"
         if not skill_path.is_file():

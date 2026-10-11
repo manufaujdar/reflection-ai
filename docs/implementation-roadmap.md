@@ -68,5 +68,10 @@ Implemented foundations:
 6. Personalization metrics, promotion thresholds and a versioned rollback registry.
 7. Query-aware selection, multi-channel fusion and bounded inert context compilation.
 8. Consent/data/evaluation-gated training orchestration interfaces.
+9. An optional adapter-oriented reference SLM, byte tokenizer, local experimental
+   training backend, and transparent chatbot learning-readiness controls.
 
-Next implementation work is operational: persist the queue and registry, build real embedding/graph adapters, run the benchmark matrix, add authentication/encryption, implement holdout inference evaluators, and only then attach an SLM/LoRA training backend.
+Next implementation work is operational: persist the queue and registry, build real
+embedding/graph adapters, run the benchmark matrix, add authentication/encryption,
+implement holdout inference evaluators, and validate a pretrained SLM/PEFT backend.
+The reference SLM remains unrouted until those gates pass.

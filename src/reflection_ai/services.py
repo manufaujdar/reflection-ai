@@ -1,13 +1,11 @@
 from collections import Counter
-import hashlib
-import json
-from pathlib import Path
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from reflection_ai.config import Settings
 from reflection_ai.db import Event, Profile, TrainingRun, User, utcnow
+from reflection_ai.engine.artifacts import LocalArtifactStore
 from reflection_ai.ports import ProfileCandidate, ProfileExtractor
 from reflection_ai.providers import ModelProvider
 from reflection_ai.personalization import redact_training_text
@@ -182,6 +180,10 @@ class TrainingService:
 
     def __init__(self, settings: Settings):
         self.settings = settings
+        self.artifacts = LocalArtifactStore(settings.artifact_root)
+
+    def delete_subject_artifacts(self, user_id: str) -> bool:
+        return self.artifacts.delete_subject(user_id)
 
     def run(self, db: Session, user: User) -> TrainingRun:
         events = list(
@@ -192,6 +194,8 @@ class TrainingService:
             ).all()
         )
         run = TrainingRun(user_id=user.id, event_count=len(events))
+        db.add(run)
+        db.flush()
         if not user.training_consent:
             run.status = "skipped"
             run.metrics = {"reason": "training_consent_missing"}
@@ -199,7 +203,6 @@ class TrainingService:
             run.status = "skipped"
             run.metrics = {"reason": "insufficient_positive_events"}
         else:
-            Path("artifacts").mkdir(exist_ok=True)
             examples = []
             redaction_count = 0
             for event in events:
@@ -225,28 +228,25 @@ class TrainingService:
                 holdout_size = max(1, round(len(examples) * 0.2))
                 train_examples = examples[:-holdout_size]
                 holdout_examples = examples[-holdout_size:]
-                payload = (
-                    "\n".join(json.dumps(item, sort_keys=True) for item in train_examples) + "\n"
-                )
-                dataset_hash = hashlib.sha256(payload.encode("utf-8")).hexdigest()
-                artifact = Path("artifacts") / f"dataset-{run.id}-{dataset_hash[:12]}.jsonl"
-                holdout = Path("artifacts") / f"holdout-{run.id}-{dataset_hash[:12]}.jsonl"
-                artifact.write_text(payload, encoding="utf-8")
-                holdout.write_text(
-                    "\n".join(json.dumps(item, sort_keys=True) for item in holdout_examples) + "\n",
-                    encoding="utf-8",
+                artifact = self.artifacts.write_training_dataset(
+                    user.id,
+                    run.id,
+                    train_examples,
+                    holdout_examples,
                 )
                 run.status = "dataset_ready"
-                run.artifact_uri = str(artifact)
+                run.artifact_uri = artifact.dataset_uri
                 run.metrics = {
-                    "dataset_hash": dataset_hash,
+                    "dataset_hash": artifact.dataset_hash,
+                    "holdout_hash": artifact.holdout_hash,
                     "examples": len(train_examples),
                     "holdout_examples": len(holdout_examples),
-                    "holdout_uri": str(holdout),
+                    "holdout_uri": artifact.holdout_uri,
+                    "manifest_uri": artifact.manifest_uri,
+                    "artifact_scope": artifact.scope,
                     "redactions": redaction_count,
                     "promotion_required": True,
                 }
-        db.add(run)
         db.commit()
         db.refresh(run)
         return run

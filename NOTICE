@@ -1,0 +1,12 @@
+Reflection AI
+
+Copyright 2026 Manu Faujdar.
+
+This repository contains original research-framework code. It does not vendor
+source from the open-source memory projects reviewed in the research audit.
+Optional integrations use published client interfaces and retain their own
+copyright, license, model, dataset, and service terms. See
+THIRD_PARTY_NOTICES.md and PROVENANCE.md.
+
+No real conversations, user profiles, private databases, credentials, model
+weights, or training datasets are included in the intended source distribution.

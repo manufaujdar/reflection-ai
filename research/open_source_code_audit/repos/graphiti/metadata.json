@@ -1,0 +1,14 @@
+{
+  "name": "graphiti",
+  "repository": "https://github.com/getzep/graphiti",
+  "commit": "526dcad7a300f3c5c506ff96a68bcdc7ca9f97ed",
+  "branch": "main",
+  "commit_date": "2026-07-09T07:08:38Z",
+  "generated_at": "2026-07-15T10:31:23.520904+00:00",
+  "tracked_files": 352,
+  "text_lines": 156973,
+  "approximate_code_lines": 140022,
+  "bytes": 22324358,
+  "symbols": 2539,
+  "relevant_paths": 7
+}

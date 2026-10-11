@@ -54,3 +54,31 @@ def test_validator_rejects_malformed_ui_metadata():
             'interface:\n  display_name: "Valid"\n default_prompt: "$valid"',
             Path("openai.yaml"),
         )
+
+
+def test_validator_accepts_speckit_commands_without_hiding_unknown_roles(tmp_path, monkeypatch):
+    validator = load_validator()
+    skills = tmp_path / "skills"
+    skills.mkdir()
+    for name in validator.EXPECTED_SKILLS:
+        (skills / name).symlink_to(validator.SKILLS_ROOT / name, target_is_directory=True)
+    monkeypatch.setattr(validator, "SKILLS_ROOT", skills)
+    command = skills / "speckit-analyze"
+    command.mkdir()
+    (command / "SKILL.md").write_text("Spec Kit command with its separate manifest.")
+    assert validator.validate() == []
+
+    unknown = skills / "unknown-role"
+    unknown.mkdir()
+    (unknown / "SKILL.md").write_text("Invalid role metadata.")
+    assert any("missing agents/openai.yaml" in error for error in validator.validate())
+
+    source = ROOT / ".agents" / "skills" / "reflection-plan"
+    (unknown / "agents").mkdir()
+    (unknown / "SKILL.md").write_text(
+        (source / "SKILL.md").read_text().replace("reflection-plan", "unknown-role")
+    )
+    (unknown / "agents" / "openai.yaml").write_text(
+        (source / "agents" / "openai.yaml").read_text().replace("reflection-plan", "unknown-role")
+    )
+    assert any("unexpected skills: unknown-role" in error for error in validator.validate())

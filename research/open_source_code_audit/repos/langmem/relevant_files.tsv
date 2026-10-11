@@ -1,0 +1,9 @@
+path	matched_terms	lines
+docs/docs/concepts/img/update-profile.png	profile	0
+docs/docs/guides/manage_user_profile.md	profile	150
+docs/docs/guides/memory_tools.md	memory	159
+docs/docs/guides/optimize_memory_prompt.md	memory	140
+docs/docs/reference/memory.md	memory	13
+examples/intro_videos/procedural_memory.ipynb	memory	592
+examples/intro_videos/semantic_memory.ipynb	memory	543
+src/langmem/reflection.py	reflect	474

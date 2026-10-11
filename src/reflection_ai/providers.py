@@ -7,11 +7,15 @@ from reflection_ai.config import Settings
 
 class ModelProvider(ABC):
     @abstractmethod
-    async def generate(self, system: str, prompt: str) -> str: ...
+    async def generate(
+        self, system: str, prompt: str, history: list[dict[str, str]] | None = None
+    ) -> str: ...
 
 
 class MockProvider(ModelProvider):
-    async def generate(self, system: str, prompt: str) -> str:
+    async def generate(
+        self, system: str, prompt: str, history: list[dict[str, str]] | None = None
+    ) -> str:
         return f"[personalized mock] {prompt}"
 
 
@@ -25,12 +29,15 @@ class OpenAICompatibleProvider(ModelProvider):
         self.api_key = settings.model_api_key
         self.model = settings.model_name
 
-    async def generate(self, system: str, prompt: str) -> str:
+    async def generate(
+        self, system: str, prompt: str, history: list[dict[str, str]] | None = None
+    ) -> str:
         headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
         payload = {
             "model": self.model,
             "messages": [
                 {"role": "system", "content": system},
+                *(history or []),
                 {"role": "user", "content": prompt},
             ],
         }
