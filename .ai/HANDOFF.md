@@ -87,3 +87,11 @@ User authorized consolidating the existing premium-scroll-settings branch into m
 ## Main-push engineering tooling — 11 October 2026
 
 User authorized suitable tools and main-only publication. Active gear: engineering/build followed by independent Review and QA. Scope: repo-owned quality commands, workflow/docs/secret gates and synthetic browser regressions; no runtime policy, clinical/provider data, model run, deployment or hook replacement. Acceptance: native suites and new gates pass, representative failure paths reject, root review resolves findings, exact main push and hosted CI are verified. Tool pins/source/limitations are in TOOLING.md; transient evidence is in the portfolio tooling receipt. Next owner after publication: maintainer for governed release and physical-device approval.
+
+## Portfolio documentation maintenance — 20 October 2026
+
+- Objective/scope: improve task-based documentation navigation and file placement under the authorized portfolio maintenance request. Active gear: documentation; owner: portfolio coordinator. Preserve runtime code, canonical paths and existing research/release gates.
+- Change: replace the stale documentation status list with linked task routes and a source/folder map; connect the existing entry point. Correct the obsolete missing-license claim against the tracked Apache-2.0 license.
+- Verification: scoped Markdown lint, offline repository-relative links and `git diff --check` pass. No application behavior, identity, personal data, provider request, training, experiment result, deployment or release is changed.
+- Review boundary: the portfolio CodeRabbit installer returned HTTP 403; no CodeRabbit code review or substitute code review is claimed. GitHub readiness/comments were inventoried separately at the current PR heads.
+- Next owner/action: coordinator reviews this documentation-only commit and completes the existing publication gates; owning engineering backlog remains authoritative. Rollback: revert this documentation commit.

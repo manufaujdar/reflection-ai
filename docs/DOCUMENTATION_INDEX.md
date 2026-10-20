@@ -1,34 +1,37 @@
 # Documentation index
 
-Reflection AI is a consent-aware personalization and memory research
-framework. It separates immediate evidence-backed personalization from slower,
-evaluated model training. The local starter is not a production multi-tenant
-service.
+Reflection AI separates immediate evidence-backed personalization from slower,
+evaluated model training. The local starter remains an alpha research framework;
+an accepted contract does not establish implemented production authentication.
 
-## Authoritative documents
+## Find the right document
 
-- README.md: learning loop, quick start, project map, and production gaps.
-- docs/architecture.md: core boundaries and extension points.
-- docs/personalization-core.md and docs/engine-building-blocks.md: implemented invariants and baselines.
-- docs/authentication-tenant-contract.md: proposed Privacy/Security contract; not implemented behavior.
-- docs/open-source-landscape.md and docs/implementation-roadmap.md: research and phased work.
-- docs/agent-team.md, AGENTS.md, .ai/, and .agents/skills/: delivery controls.
-- docs/technical-overview.md: code, technology, lifecycle, and validation baseline.
-
-## Initial documentation set
-
-| Area | Status |
+| Task | Read |
 | --- | --- |
-| Product/research scope | Present |
-| Architecture and data lifecycle | Present |
-| Codebase and extension points | Added |
-| Technology and local operations | Added |
-| Auth/tenant/privacy contract | Proposed, not implemented |
-| Security and deletion boundary | Present as contract/research gate |
-| Tests and release workflow | Present |
-| License and provenance | Human follow-up; no GitHub license metadata |
+| Install and exercise the local loop | [Root README](../README.md) and [reading order](README.md) |
+| Understand code and extension points | [Architecture](architecture.md), [technical overview](technical-overview.md) and [engine building blocks](engine-building-blocks.md) |
+| Change evidence, memory or deletion | [Personalization core](personalization-core.md) and [validation protocol](../VALIDATION_PROTOCOL.md) |
+| Change chat or optional model experiments | [Adaptive chatbot](adaptive-chatbot.md) and [reference SLM](reference-slm.md) |
+| Plan authentication and tenant isolation | [Accepted identity contract](authentication-tenant-contract.md); implementation remains pending |
+| Plan future work or compare approaches | [Implementation roadmap](implementation-roadmap.md) and [open-source landscape](open-source-landscape.md) |
+| Contribute and run checks | [Contributing](../CONTRIBUTING.md), [validation commands](../Makefile) and [tooling](../TOOLING.md) |
+| Check licensing, provenance or data limits | [License](../LICENSE), [third-party notices](../THIRD_PARTY_NOTICES.md), [provenance](../PROVENANCE.md) and [privacy boundary](../PRIVACY_AND_DATA_BOUNDARY.md) |
+| Resume agent work | [Agent guide](../AGENTS.md), [delivery team](agent-team.md) and [active handoff](../.ai/HANDOFF.md) |
 
-Use Mem0, LangMem, Letta, Hindsight, and OpenTelemetry as comparison points.
-Keep evidence and policy canonical; vector/graph indexes and model adapters
-remain replaceable.
+## File placement
 
+| Location | Purpose |
+| --- | --- |
+| `src/reflection_ai/` | Runtime packages, adapters and bundled frontend |
+| `tests/` | Synthetic behavior and trust-invariant fixtures |
+| `docs/` | Maintained explanations, contracts and plans |
+| `research/` | Reviewed external-system research with provenance |
+| `tools/`, `scripts/` | Repository audits, checks and maintenance commands |
+| `.ai/`, `.agents/` | Project continuity and scoped delivery roles |
+| `archive/` | Retained inactive work; no runtime authority |
+| `artifacts/` | Generated local output; never a place for real user data |
+
+Keep implementation evidence in the active handoff and avoid duplicating the
+roadmap in new task lists. Preserve generated audit indexes and canonical paths.
+Apache-2.0 covers repository source; external data, weights and services retain
+their own terms and review requirements.
