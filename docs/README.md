@@ -1,5 +1,8 @@
 # Reflection AI documentation
 
+Use the [documentation index](DOCUMENTATION_INDEX.md) to find the owning contract,
+validation guide, or folder for a change.
+
 Recommended reading order:
 
 1. [`../README.md`](../README.md) — local loop, quick start, and explicit limits.
